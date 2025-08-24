@@ -30,6 +30,7 @@ const BuildOptions = z.object({
       z.literal("external"),
     ])
     .default("linked"),
+  plugins: z.string().optional(),
 });
 
 const projectRoot = process.cwd();
@@ -79,6 +80,10 @@ if (process.argv[2] == "build") {
       minify: argv.minify || config.minify,
       splitting: argv.splitting || config.splitting,
       sourcemap: argv.sourcemap || config.sourcemap,
+      plugins:
+        typeof config.plugins == "string"
+          ? (await import(path.resolve(projectRoot, config.plugins))).default
+          : undefined,
     }
   );
   await fs.rm(inter, { recursive: true, force: true });
@@ -89,6 +94,10 @@ if (process.argv[2] == "build") {
     minify: argv.minify || config.minify,
     splitting: argv.splitting || config.splitting,
     sourcemap: argv.sourcemap || config.sourcemap,
+    plugins:
+      typeof config.plugins == "string"
+        ? (await import(path.resolve(projectRoot, config.plugins))).default
+        : undefined,
   });
   await fs.rm(inter, { recursive: true, force: true });
 } else if (process.argv[2] == "init") {

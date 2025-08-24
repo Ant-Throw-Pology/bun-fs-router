@@ -1,4 +1,4 @@
-import { build } from "bun";
+import { build, type BunPlugin } from "bun";
 import path from "node:path";
 import { prerenderToNodeStream } from "react-dom/static";
 import { getRoutes } from "./getRoutes";
@@ -18,11 +18,13 @@ export async function bfrBuild(
     minify,
     splitting,
     sourcemap,
+    plugins,
   }: {
     relativePublicPath: boolean;
     minify: boolean;
     splitting: boolean;
     sourcemap: false | "none" | "inline" | "linked" | "external";
+    plugins: BunPlugin[];
   }
 ) {
   const routes = await getRoutes(base);
@@ -44,6 +46,7 @@ export async function bfrBuild(
       external: ["react", "react-dom"], // prevent "Invalid hook call" errors
       target: "browser",
       publicPath,
+      plugins,
     });
     const serverIndex = serverResult.outputs.find(
       (artifact) => artifact.kind == "entry-point"
@@ -98,14 +101,7 @@ hydrateRoot(
       publicPath,
       splitting,
       // root: base,
-      plugins: [
-        {
-          name: "bun-fs-router min-runtime styling",
-          setup(build) {
-            build.onLoad({ filter: /^bun-fs-router\/styling$/ }, (args) => {});
-          },
-        },
-      ],
+      plugins,
     });
     for (const artifact of result.outputs) {
       const dest = path.join(

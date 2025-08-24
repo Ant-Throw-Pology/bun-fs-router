@@ -1,4 +1,4 @@
-import { build, serve } from "bun";
+import { build, serve, type BunPlugin } from "bun";
 import { renderToReadableStream } from "react-dom/server";
 import path from "node:path";
 import fs from "node:fs/promises";
@@ -17,11 +17,13 @@ export async function brfServe(
     minify,
     splitting,
     sourcemap,
+    plugins,
   }: {
     relativePublicPath: boolean;
     minify: boolean;
     splitting: boolean;
     sourcemap: false | "none" | "inline" | "linked" | "external";
+    plugins: BunPlugin[];
   }
 ) {
   await fs.rm(filesDir, { force: true, recursive: true });
@@ -73,6 +75,7 @@ export async function brfServe(
           external: ["react", "react-dom"], // prevent "Invalid hook call" errors
           target: "browser",
           publicPath,
+          plugins,
         });
         const serverIndex = serverResult.outputs.find(
           (artifact) => artifact.kind == "entry-point"
@@ -132,6 +135,7 @@ hydrateRoot(
           target: "browser",
           publicPath,
           // root: base,
+          plugins,
         });
         for (const artifact of result.outputs) {
           const dest = path.join(
