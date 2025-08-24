@@ -1,8 +1,3 @@
-declare module "*.svg" {
-  const file: string;
-  export = file;
-}
-
 interface RegExpConstructor {
   /**
    * The RegExp.escape() static method escapes any potential regex syntax
