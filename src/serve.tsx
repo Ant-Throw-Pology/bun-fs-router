@@ -186,6 +186,8 @@ hydrateRoot(
 
   await new Promise<void>((resolve) => {
     process.once("SIGINT", () => {
+      console.log("Stopping...");
+      server.stop(true);
       resolve();
     });
   });
